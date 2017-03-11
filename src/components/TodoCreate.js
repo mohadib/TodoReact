@@ -54,6 +54,7 @@ class TodoCreate extends Component
       {
          this.props.save( this.props.selectedTodo, ()=>{
             this.props.getAll( this.props.paging );
+            this.props.clearSelection();
          });
       }
 
@@ -128,8 +129,11 @@ function mapDispatchToProps( dispatch, state )
       update: todoService.updateAction(dispatch),
       getAll: todoService.getAll( dispatch ),
       clearSelection: (event)=> {
-         event.target.blur();
-         event.preventDefault();
+         if( event !== undefined )
+         {
+            event.target.blur();
+            event.preventDefault();
+         }
          dispatch({ type:TodoActions.SELECTION_CLEARED });
       },
       propertyUpdated: ( todo )=>{ dispatch({type: TodoActions.PROPERTY_UPDATED, payload:todo }) },

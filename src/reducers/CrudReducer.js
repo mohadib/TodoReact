@@ -23,6 +23,14 @@ export default function(entityName, entityNamePlural, actions)
    };
 
    const actionMap = Object.freeze({
+      [ actions.DELETE_SUCCESS ] : function ( state, action )
+      {
+         if( state[entName] && state[entName].id == action.payload )
+         {
+            return { ...state, [entName]:null}
+         }
+         return state;
+      },
       [actions.SELECTED]: function (state, action)
       {
          return {...state, [entName]: action.payload, editing: true,  err: null, saving: false, saved: false}

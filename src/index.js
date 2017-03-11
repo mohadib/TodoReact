@@ -7,6 +7,7 @@ import store from './store';
 import axios from 'axios';
 import { SessionActions } from './actions/ActionTypes';
 
+
 axios.defaults.baseURL = '/api';
 
 axios.interceptors.response.use(

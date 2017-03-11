@@ -3,9 +3,16 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux'
 import Todo from './Todo';
 import {todoService} from '../services/EntityServices';
+import { Modal, Button } from 'react-bootstrap'
 
 class TodoList extends Component
 {
+
+   constructor( props )
+   {
+      super( props );
+      this.state = { showModal : false, todo:null }
+   }
 
    componentWillMount()
    {
@@ -15,11 +22,35 @@ class TodoList extends Component
    changePage( event )
    {
       //TODO make this page through search results...
-
       let pageNum = event.target.getAttribute('data');
       this.props.getTodos({ offset: parseInt( pageNum ) });
       window.scrollTo(0,0);
       event.preventDefault();
+   }
+
+   handleDeleteClick( todo )
+   {
+      this.setState({ showModal : true , todo:todo});
+   }
+
+   cancelDelete()
+   {
+      this.setState({ showModal : false, todo:null });
+   }
+
+   deleteTodo()
+   {
+      let that = this;
+      this.props.deleteTodo( this.state.todo.id, ()=>{
+         that.props.getTodos({
+            offset: this.props.offset,
+            limit: this.props.limit,
+            sort: this.props.sort,
+            direction: this.props.direction
+         })
+      });
+
+      this.setState({ showModal : false , todo:null});
    }
 
    getPagination()
@@ -75,12 +106,31 @@ class TodoList extends Component
                { this.props.todos.map( ( todo )=>{
                   return (
                      <li key={todo.id}>
-                        <Todo todo={todo}/>
+                        <Todo todo={todo} deleteTodo={ this.handleDeleteClick.bind(this)}/>
                      </li>
                   )
                } ) }
             </ul>
             { this.getPagination() }
+
+            <div className="static-modal">
+               <Modal show={this.state.showModal} onHide={this.cancelDelete.bind(this)} >
+                  <Modal.Header>
+                     <Modal.Title><strong>Confirm Delete Todo</strong></Modal.Title>
+                  </Modal.Header>
+
+                  <Modal.Body id="dialogBody">
+                     <p><strong>Delete Todo?</strong></p>
+                     <p>{ this.state.todo && this.state.todo.title }</p>
+                  </Modal.Body>
+
+                  <Modal.Footer>
+                     <Button onClick={this.cancelDelete.bind(this)}>Cancel</Button>
+                     <Button bsStyle="danger" onClick={this.deleteTodo.bind(this)}>Delete</Button>
+                  </Modal.Footer>
+               </Modal>
+            </div>
+
          </div>
       )
    }
@@ -112,7 +162,8 @@ function mapStateToProps( state )
 function mapDispatchToProps( dispatch, state )
 {
    return {
-      getTodos: todoService.getAll(dispatch)
+      getTodos: todoService.getAll(dispatch),
+      deleteTodo: todoService.deleteAction( dispatch )
    }
 }
 

@@ -8,7 +8,7 @@ export default function ( urlBase, actionTypes, createFn )
 
    function deleteAction( dispatch )
    {
-      return function ( id )
+      return function ( id, callback )
       {
          console.log('delete action called in rest ' + urlBase);
          dispatch({type: actionTypes.DELETE_REQUEST, payload: id});
@@ -17,7 +17,10 @@ export default function ( urlBase, actionTypes, createFn )
             {
                dispatch({type: actionTypes.DELETE_SUCCESS, payload: id});
                dispatch(newInfomationAlert('Entity deleted'));
-               browserHistory.push(urlBase)
+               if( callback !== undefined )
+               {
+                  callback.call();
+               }
             })
             .catch(( err ) =>
             {
@@ -77,7 +80,7 @@ export default function ( urlBase, actionTypes, createFn )
    {
       function getPaging( paging )
       {
-         paging = paging || {}
+         paging = paging || {};
          return {
             offset: paging.offset || 0,
             limit: paging.limit || 10,

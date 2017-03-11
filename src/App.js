@@ -13,7 +13,7 @@ class App extends Component
 {
    constructor( props )
    {
-      super(props )
+      super(props );
       this.timeout = undefined;
    }
 
@@ -63,13 +63,20 @@ class App extends Component
    {
       if(  event.keyCode === 13 )
       {
-         this.props.search( event.target.value );
+         if( event.target.value.trim().length === 0)
+         {
+            this.clear( event );
+         }
+         else this.props.search( event.target.value );
       }
    }
 
-   clear()
+   clear(event)
    {
+      document.getElementById("searchField").value="";
       this.props.clearSearch();
+      event.target.blur();
+      document.getElementById("searchField").focus();
    }
 
     render()
@@ -98,7 +105,7 @@ class App extends Component
                </Navbar.Header>
                <Navbar.Form pullLeft>
                   <FormGroup>
-                     <FormControl type="text" placeholder="Search" onKeyDown={ this.enter.bind(this) }/>
+                     <FormControl id="searchField" type="text" placeholder="Search" onKeyDown={ this.enter.bind(this) }/>
                   </FormGroup>
                   {' '}
                   <Button onClick={this.clear.bind(this)}>Clear</Button>
@@ -118,7 +125,6 @@ class App extends Component
                   <TodoCreate/>
                </div>
             </div>
-
          </div>
 
        )
