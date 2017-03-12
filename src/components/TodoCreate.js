@@ -10,8 +10,6 @@ class TodoCreate extends Component
 
    componentWillReceiveProps( nextProps )
    {
-      console.log("tehg");
-
       // if we dont have a selected todo, create a new one
       if( !nextProps.selectedTodo )
       {
