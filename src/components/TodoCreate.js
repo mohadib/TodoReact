@@ -39,24 +39,23 @@ class TodoCreate extends Component
       {
          todo.description = event.target.value;
       }
-      else todo.done = event.target.checked;
+      else if( event.target.id === 'done')
+      {
+         todo.done = event.target.checked;
+      }
 
       this.props.propertyUpdated( todo );
    }
 
    saveOrUpdate( event )
    {
-      if( this.props.selectedTodo.id )
-      {
-         this.props.update( this.props.selectedTodo );
-      }
-      else
-      {
-         this.props.save( this.props.selectedTodo, ()=>{
-            this.props.getAll( this.props.paging );
-            this.props.clearSelection();
-         });
-      }
+      let that = this;
+      let fn = this.props.selectedTodo.id ? this.props.update : this.props.save;
+
+      fn(this.props.selectedTodo, function(){
+         that.props.getAll( that.props.paging );
+         that.props.clearSelection();
+      });
 
       event.target.blur();
       event.preventDefault();
@@ -66,6 +65,12 @@ class TodoCreate extends Component
    {
       return this.props.selectedTodo.id ? "Editing Todo" : "New Todo";
    }
+
+   validate()
+   {
+      return this.props.selectedTodo.title.trim().length > 0;
+   }
+
 
    render()
    {
@@ -88,21 +93,22 @@ class TodoCreate extends Component
                   </FormGroup>
 
                   <div className="col-xs-6" style={{'padding-left':'0px'}}>
-                     <FormGroup controlId="done">
-                        <Checkbox checked={this.props.selectedTodo.done}>
-                           Done
-                        </Checkbox>
-                     </FormGroup>
+                     <div className="col-xs-3" style={{marginRight:'10px', paddingLeft:'0px'}}>
+                        <FormGroup>
+                           <Checkbox checked={this.props.selectedTodo.done} id="done">
+                              Done
+                           </Checkbox>
+                        </FormGroup>
+                     </div>
                   </div>
                </div>
 
                <div className="col-xs-6 text-right" style={{'padding-right':'0px'}}>
                   <ButtonGroup>
-                     <Button onClick={this.saveOrUpdate.bind(this) }>Save</Button>
+                     <Button onClick={this.saveOrUpdate.bind(this) } disabled={!this.validate()}>Save</Button>
                      <Button onClick={this.props.clearSelection}>Clear</Button>
                   </ButtonGroup>
                </div>
-
             </div>
          </div>
       )

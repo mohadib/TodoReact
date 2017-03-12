@@ -39,6 +39,7 @@ body{
     pointer-events: none
 }
 
+
 #alertContainer div{
     min-width: 300px;
     background: steelblue;
@@ -102,6 +103,22 @@ body{
 
 #description{
     height: 200px;
+}
+
+
+.list-header{
+    margin-bottom: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 0px;
+}
+
+.sort-icon{
+    transform: translate(-100%, 75%);
+}
+
+#showDoneContainer .checkbox{
+    margin-bottom: 0;
 }
 
 .widget-title{

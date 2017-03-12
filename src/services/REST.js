@@ -57,7 +57,7 @@ export default function ( urlBase, actionTypes, createFn )
 
    function updateAction( dispatch )
    {
-      return ( entity ) =>
+      return ( entity, callback ) =>
       {
          console.log('update action called in rest ' + urlBase);
          dispatch({type: actionTypes.UPDATE_REQUEST, payload: entity});
@@ -66,6 +66,11 @@ export default function ( urlBase, actionTypes, createFn )
             {
                dispatch({type: actionTypes.SAVE_SUCCESS, payload: createFn(resp.data)});
                dispatch(newInfomationAlert('Entity Saved'));
+
+               if( callback !== undefined )
+               {
+                  callback.call();
+               }
                //browserHistory.push(urlBase);
             })
             .catch(( err ) =>
@@ -84,8 +89,8 @@ export default function ( urlBase, actionTypes, createFn )
          return {
             offset: paging.offset || 0,
             limit: paging.limit || 10,
-            sort: paging.sort || 'id',
-            direction: paging.direction || 'asc'
+            sort: paging.sort || 'created',
+            direction: paging.direction || 'desc'
          }
       }
 

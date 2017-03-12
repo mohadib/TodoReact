@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux'
 import Todo from './Todo';
 import {todoService} from '../services/EntityServices';
-import { Modal, Button } from 'react-bootstrap'
+import { Modal, Button, FormGroup, Checkbox } from 'react-bootstrap'
 
 class TodoList extends Component
 {
@@ -16,7 +16,30 @@ class TodoList extends Component
 
    componentWillMount()
    {
-      this.props.getTodos({ direction: 'asc' });
+      this.props.getTodos({
+         direction: 'desc',
+         sort: 'created'
+      });
+   }
+
+   changeSortDirection()
+   {
+      this.props.getTodos({
+         offset: this.props.offset,
+         limit: this.props.limit,
+         sort: this.props.sort,
+         direction: this.props.direction === 'asc' ? 'desc' : 'asc'
+      });
+   }
+
+   changeSortField( event )
+   {
+      this.props.getTodos({
+         offset: this.props.offset,
+         limit: this.props.limit,
+         sort: event.target.value,
+         direction: this.props.direction
+      });
    }
 
    changePage( event )
@@ -42,8 +65,17 @@ class TodoList extends Component
    {
       let that = this;
       this.props.deleteTodo( this.state.todo.id, ()=>{
+
+         //if we are deleteing the only item on a page
+         // try to display the previous page
+         let offset = this.props.offset;
+         if( this.props.todos.length === 1)
+         {
+            offset = Math.max( offset - 1, 0);
+         }
+
          that.props.getTodos({
-            offset: this.props.offset,
+            offset: offset,
             limit: this.props.limit,
             sort: this.props.sort,
             direction: this.props.direction
@@ -93,6 +125,30 @@ class TodoList extends Component
       );
    }
 
+   getSort()
+   {
+      let options = [
+         { field: 'title', display: 'Title'},
+         { field: 'description', display: 'Description'},
+         { field: 'created', display: 'Created'},
+         { field: 'lastUpdated', display: 'Updated'}
+      ];
+      return (
+         <select id="sort" className="form-control" onChange={this.changeSortField.bind(this)} defaultValue={this.props.sort}>
+            { options.map( ( option )=> {
+               return <option key={option.field} value={option.field}>{option.display}</option>
+            }) }
+         </select>
+      )
+   }
+
+   getSortClasses()
+   {
+      return this.props.direction === 'desc'
+         ? 'sort-icon glyphicon glyphicon-sort-by-attributes-alt'
+         : 'sort-icon glyphicon glyphicon-sort-by-attributes'
+   }
+
    render()
    {
       if( this.props.todos.length === 0 )
@@ -102,6 +158,22 @@ class TodoList extends Component
 
       return(
          <div>
+            <div className="col-xs-12 list-header widget">
+               <div className="col-xs-5">
+                  { this.getSort() }
+               </div>
+               <div className="col-xs-1">
+                  <p onClick={this.changeSortDirection.bind(this)} className={this.getSortClasses()}></p>
+               </div>
+               <div className="col-xs-1 pull-right" style={{ paddingRight:'50px'}} id="showDoneContainer">
+                  <Checkbox>
+                     Done
+                  </Checkbox>
+               </div>
+            </div>
+
+
+
             <ul id="todo-ul">
                { this.props.todos.map( ( todo )=>{
                   return (
